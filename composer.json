@@ -1,0 +1,24 @@
+{
+	"name": "yii2extension/yii2-neuron",
+	"type": "yii2-extension",
+	"keywords": ["yii2","neuron"],
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Yamshikov Vitaliy",
+			"email": "theyamshikov@yandex.ru"
+		}
+	],
+	"minimum-stability": "dev",
+	"autoload": {
+		"psr-4": {
+			"yii2extension\\neuron\\": "src",
+			"yii2extension\\neuron\\tests\\": "tests"
+		}
+	},
+	"require": {
+		"yiisoft/yii2": "*",
+		"nlp-tools/nlp-tools": "^0.1.3",
+		"php": ">=5.3.0"
+	}
+}
