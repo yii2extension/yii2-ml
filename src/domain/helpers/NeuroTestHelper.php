@@ -2,24 +2,40 @@
 
 namespace yii2extension\ml\domain\helpers;
 
+use yii2extension\ml\domain\dto\TestResult;
+
 class NeuroTestHelper {
 
-	public static function testClassify($testSet, $ai) {
+	public static function testClassify(array $test, ClassifyHelper $classify, array $classes = []) {
         $result = [];
-
-        foreach ($testSet as $testDocument) {
+        $percent = [
+            true => 0,
+            false => 0,
+        ];
+        foreach ($test as $testDocument) {
             list($expectedClass, $value) = $testDocument;
-            $prediction = $ai->classify($value);
+            $prediction = $classify->classify($value, $classes);
             $result[] = [
                 $value,
                 $expectedClass,
                 $prediction,
             ];
-            if($prediction != $expectedClass) {
-                throw new \Exception('Error prediction!');
-            }
+            $isOk = $prediction == $expectedClass;
+            $percent[$isOk]++;
         }
-        return $result;
+        return [
+            'totalPercent' => NeuroTestHelper::getPercent($test, $percent),
+            'percent' => $percent,
+            'result' => $result,
+        ];
 	}
-	
+
+    public static function getPercent($test, $percent) : TestResult {
+        $totalRate = count($test) / 100;
+        $testResult = new TestResult;
+        $testResult->ok = $percent[true] / $totalRate;
+        $testResult->fail = $totalRate * $percent[false];
+        return $testResult;
+    }
+
 }

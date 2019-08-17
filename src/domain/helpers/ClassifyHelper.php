@@ -33,10 +33,11 @@ class ClassifyHelper {
 	public function __construct()
     {
         $this->model = new FeatureBasedNB;
+        $this->tokenizer = new WhitespaceTokenizer;
     }
 
-    public function classify($value) {
-        $prediction = $this->classifier->classify(array('usa', 'uk'), new TokensDocument($this->tokenizer->tokenize($value)));
+    public function classify($value, array $classes) {
+        $prediction = $this->classifier->classify($classes, new TokensDocument($this->tokenizer->tokenize($value)));
         return $prediction;
     }
 
@@ -54,7 +55,9 @@ class ClassifyHelper {
     public function train($training) {
         $trainingSet = new TrainingSet();
         foreach ($training as $trainingDocument) {
-            $trainingSet->addDocument($trainingDocument[0], new TokensDocument($this->tokenizer->tokenize($trainingDocument[1])));
+            if(count($trainingDocument) > 1) {
+                $trainingSet->addDocument($trainingDocument[0], new TokensDocument($this->tokenizer->tokenize($trainingDocument[1])));
+            }
         }
         $features = new DataAsFeatures();
         $this->model->train($features, $trainingSet);
@@ -62,19 +65,3 @@ class ClassifyHelper {
     }
 
 }
-
-/*
-// *************** Example ***************
-$training = include(ROOT_DIR . DS . 'vendor/yii2extension/yii2-ml/src/domain/data/example1/training.php');
-$testSet = include(ROOT_DIR . DS . 'vendor/yii2extension/yii2-ml/src/domain/data/example1/test.php');
-$expected = include(ROOT_DIR . DS . 'vendor/yii2extension/yii2-ml/src/domain/data/example1/expected.php');
-$model = include(ROOT_DIR . DS . 'vendor/yii2extension/yii2-ml/src/domain/data/example1/model.php');
-
-$ai = new ClassifyHelper;
-$ai->tokenizer = new WhitespaceTokenizer;
-$ai->train($training);
-//$ai->setModel($model);
-
-$result = NeuroTestHelper::testClassify($testSet, $ai);
-d($result == $expected, 1);
- */
