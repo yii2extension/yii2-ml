@@ -1,7 +1,7 @@
 {
-	"name": "yii2extension/yii2-neuron",
+	"name": "yii2extension/yii2-ml",
 	"type": "yii2-extension",
-	"keywords": ["yii2","neuron"],
+	"keywords": ["yii2","ml"],
 	"license": "MIT",
 	"authors": [
 		{
@@ -12,8 +12,8 @@
 	"minimum-stability": "dev",
 	"autoload": {
 		"psr-4": {
-			"yii2extension\\neuron\\": "src",
-			"yii2extension\\neuron\\tests\\": "tests"
+			"yii2extension\\ml\\": "src",
+			"yii2extension\\ml\\tests\\": "tests"
 		}
 	},
 	"require": {
