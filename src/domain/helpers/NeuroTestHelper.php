@@ -3,11 +3,40 @@
 namespace yii2extension\ml\domain\helpers;
 
 use yii2extension\ml\domain\dto\TestResult;
+use yii2rails\extension\develop\helpers\Benchmark;
 
 class NeuroTestHelper {
 
-    //const OK = 'ok';
-    //const FAIL = 'fail';
+    public static function testClassifyItem($classify, $training, $trainPercent, $classes) {
+        $collectionDto = \yii2extension\ml\domain\helpers\SplitHelper::split($training, $trainPercent);
+
+        Benchmark::begin('train');
+        $classify->train($collectionDto->train);
+        Benchmark::end('train');
+
+        Benchmark::begin('test');
+        $testResultDto = NeuroTestHelper::testClassify($collectionDto->test, $classify, $classes);
+        $okCount = $testResultDto->okCount;
+        Benchmark::end('test');
+
+        $benchmark = \yii\helpers\ArrayHelper::map(Benchmark::all(), 'name', 'duration');
+
+        return [
+            'collection' => [
+                'total' => NeuroTestHelper::renderItem(100, count($collectionDto->all)),
+                'train' => NeuroTestHelper::renderItem($trainPercent, count($collectionDto->train)),
+                'test' => NeuroTestHelper::renderItem(100 - $trainPercent, count($collectionDto->test)),
+            ],
+            'test' => [
+                'ok' => NeuroTestHelper::renderItemInfo($collectionDto->test, $okCount),
+                'fail' => NeuroTestHelper::renderItemInfo($collectionDto->test, count($collectionDto->test) - $okCount),
+            ],
+            'benchmark' => [
+                'train' => round($benchmark['train'], 4) . ' sec.',
+                'test' => round($benchmark['test'], 4) . ' sec.',
+            ],
+        ];
+    }
 
 	public static function testClassify(array $test, ClassifyHelper $classify, array $classes = []) : TestResult {
         $failCases = [];
@@ -40,16 +69,6 @@ class NeuroTestHelper {
     public static function renderItem($percent, $count) : string {
         $percent = round($percent, 2);
 	    return $percent . '% (' . $count . ')';
-    }
-
-    public static function ___getPercent($test, $percent) : TestResult {
-        /*$totalRate = 100 / count($test);
-        $testResult = new TestResult;*/
-
-        $testResult = new TestResult;
-        $testResult->ok = self::getPercentItem($test, $percent[self::OK]); // $totalRate * $percent[self::OK];
-        $testResult->fail = self::getPercentItem($test, $percent[self::FAIL]); // $totalRate * $percent[self::FAIL];
-        return $testResult;
     }
 
     public static function getPercentItem($test, $percent) {

@@ -55,9 +55,7 @@ class ClassifyHelper {
     public function train($training) {
         $trainingSet = new TrainingSet();
         foreach ($training as $trainingDocument) {
-            if(count($trainingDocument) > 1) {
-                $trainingSet->addDocument($trainingDocument[0], new TokensDocument($this->tokenizer->tokenize($trainingDocument[1])));
-            }
+            $trainingSet->addDocument($trainingDocument[0], new TokensDocument($this->tokenizer->tokenize($trainingDocument[1])));
         }
         $features = new DataAsFeatures();
         $this->model->train($features, $trainingSet);
