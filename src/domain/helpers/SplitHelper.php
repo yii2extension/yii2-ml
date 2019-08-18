@@ -13,17 +13,24 @@ class SplitHelper {
         $collectionDto = new CollectionDto;
 		$collectionDto->all = $collection;
 
-	    $offset = (count($collection) / 100) * $percent;
-		
-		$iterator = new ArrayIterator();
-		$iterator->setCollection($collection);
-		$query = Query::forge();
-		$query->limit($offset);
-		$collectionDto->train = $iterator->all($query);
-		
-		$query = Query::forge();
-		$query->offset($offset);
-		$collectionDto->test = $iterator->all($query);
+		if($percent == 100) {
+            $collectionDto->train = $collectionDto->all;
+            $collectionDto->test = $collectionDto->all;
+        } else {
+            $offset = (count($collection) / 100) * $percent;
+
+            $iterator = new ArrayIterator();
+            $iterator->setCollection($collection);
+
+            $query = Query::forge();
+            $query->limit($offset);
+            $collectionDto->train = $iterator->all($query);
+
+            $query = Query::forge();
+            $query->offset($offset);
+            $collectionDto->test = $iterator->all($query);
+        }
+
 		return $collectionDto;
 	}
 

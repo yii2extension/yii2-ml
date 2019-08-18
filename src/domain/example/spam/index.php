@@ -15,11 +15,13 @@ $tokenizer = new \yii2extension\ml\domain\tokenizers\WhitespaceTokenizer;
 $classify = new ClassifyHelper($tokenizer);
 
 $trainPercentArray = [
+    //0.05,
     0.1,
     0.5,
     1,
     5,
-    //99
+    90,
+    //100,
 ];
 //$trainPercent = 5;
 
@@ -42,12 +44,14 @@ foreach ($trainPercentArray as $trainPercent) {
 
     $benchmark = \yii\helpers\ArrayHelper::map(Benchmark::all(), 'name', 'duration');
 
-    $totalTable[] = [
+    //$totalTable[strval($trainPercent)] = NeuroTestHelper::renderItemInfo($collectionDto->test, $okCount);
+
+    /*$totalTable[] = [
         'trainPercent' => $trainPercent,
         'okCountPercent' => NeuroTestHelper::renderItemInfo($collectionDto->test, $okCount),
-    ];
+    ];*/
 
-    $totalResult[] = [
+    $totalResult[strval($trainPercent)] = [
         'collection' => [
             'total' => NeuroTestHelper::renderItem(100, count($collectionDto->all)),
             'train' => NeuroTestHelper::renderItem($trainPercent, count($collectionDto->train)),
@@ -65,7 +69,9 @@ foreach ($trainPercentArray as $trainPercent) {
 
 }
 
-d($totalTable);
+//d(\yii\helpers\ArrayHelper::map($totalResult, 'collection.train', 'test.ok'));
+
+//d($totalTable);
 d($totalResult);
 
 /*if($trainPercent) {

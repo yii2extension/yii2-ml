@@ -18,14 +18,16 @@ class WhitespaceTokenizer implements TokenizerInterface
     {
         $str = $this->cleanText($str);
         $arr = preg_split(self::PATTERN,$str,null,PREG_SPLIT_NO_EMPTY);
+        $arr = array_unique($arr);
         return $arr;
     }
 
     private function cleanText($str) {
-        $str = preg_replace('#[^а-яА-ЯёЁa-zA-Z0-9]+#m', SPC, $str);
-        $str = preg_replace('#[0-9]{1}#m', '9', $str);
-        $str = StringHelper::removeDoubleSpace($str);
         $str = mb_strtolower($str);
+        //$str = preg_replace('#[^а-яёa-z0-9]+#mu', SPC, $str);
+        $str = preg_replace('#[^[:alnum:]]+#mu', SPC, $str);
+        $str = preg_replace('#[0-9]{1}#mu', '9', $str);
+        $str = StringHelper::removeDoubleSpace($str);
         return $str;
     }
 
