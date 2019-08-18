@@ -30,10 +30,10 @@ class ClassifyHelper {
 	 */
 	protected $classifier;
 
-	public function __construct()
+	public function __construct(TokenizerInterface $tokenizer)
     {
         $this->model = new FeatureBasedNB;
-        $this->tokenizer = new WhitespaceTokenizer;
+        $this->tokenizer = $tokenizer;
     }
 
     public function classify($value, array $classes) {

@@ -10,13 +10,16 @@ $model = include(ROOT_DIR . DS . 'vendor/yii2extension/yii2-ml/src/domain/exampl
 
 Benchmark::flushAll();
 
-$classify = new ClassifyHelper;
+$tokenizer = new \yii2extension\ml\domain\tokenizers\WhitespaceTokenizer;
+//$tokenizer = new \NlpTools\Tokenizers\WhitespaceTokenizer();
+$classify = new ClassifyHelper($tokenizer);
 
 $trainPercentArray = [
     0.1,
     0.5,
     1,
     5,
+    //99
 ];
 //$trainPercent = 5;
 
@@ -29,6 +32,8 @@ foreach ($trainPercentArray as $trainPercent) {
     Benchmark::begin('train');
     $classify->train($collectionDto->train);
     Benchmark::end('train');
+
+    //d(array_keys($classify->getModel()['condprob']));
 
     Benchmark::begin('test');
     $testResultDto = NeuroTestHelper::testClassify($collectionDto->test, $classify, ['spam', 'ham']);
