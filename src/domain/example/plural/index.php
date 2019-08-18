@@ -3,14 +3,17 @@
 use yii2extension\ml\domain\helpers\ClassifyHelper;
 use yii2extension\ml\domain\helpers\NeuroTestHelper;
 use yii2rails\extension\develop\helpers\Benchmark;
+use yii2extension\ml\domain\tokenizers\CharTokenizer;
+use yii2rails\extension\store\StoreFile;
+use yii\helpers\ArrayHelper;
 
-$training = include(ROOT_DIR . DS . 'vendor/yii2extension/yii2-ml/src/domain/example/case_of_word/data/training.php');
+$trainFileName = ROOT_DIR . DS . 'vendor/yii2extension/yii2-ml/src/domain/example/data/plural.csv';
+$store = new StoreFile($trainFileName);
+$train = $store->load();
 
 Benchmark::flushAll();
 
-//$tokenizer = new \yii2extension\ml\domain\tokenizers\WhitespaceTokenizer;
-$tokenizer = new \yii2extension\ml\domain\tokenizers\WhitespaceWordTokenizer;
-//$tokenizer = new \NlpTools\Tokenizers\WhitespaceTokenizer();
+$tokenizer = new CharTokenizer(CharTokenizer::METHOD_SOLID);
 $classify = new ClassifyHelper($tokenizer);
 
 $trainPercentArray = [
@@ -21,16 +24,16 @@ $trainPercentArray = [
     90,
 ];
 
-$classes = ['жен', 'ср', 'муж'];
+$classes = [0, 1];
 
 $totalResult = [];
 
 foreach ($trainPercentArray as $trainPercent) {
-    $totalResult[strval($trainPercent)] = NeuroTestHelper::testClassifyItem($classify, $training, $trainPercent, $classes);
+    $totalResult[strval($trainPercent)] = NeuroTestHelper::testClassifyItem($classify, $train, $trainPercent, $classes);
 }
 
 //d(($classify->getModel()['condprob']));
 
-d(\yii\helpers\ArrayHelper::map($totalResult, 'collection.train', 'test.ok'));
+d(ArrayHelper::map($totalResult, 'collection.train', 'test.ok'));
 
 d($totalResult);

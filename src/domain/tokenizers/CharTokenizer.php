@@ -42,10 +42,10 @@ class CharTokenizer implements TokenizerInterface
         $c1 = mb_substr($str, -1, 1);
 
         $arr = [
-            '1' . $c1,
-            '2' . $c2,
-            '3' . $c3,
-            //'4' . $c2 . $c1,
+            //'1' . $c1,
+            //'2' . $c2,
+            //'3' . $c3,
+            '4' . $c2 . $c1,
             //'5' . $c3 . $c2,
             //'6' . $c3 . $c2 . $c1,
         ];
