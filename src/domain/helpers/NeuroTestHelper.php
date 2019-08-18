@@ -6,52 +6,55 @@ use yii2extension\ml\domain\dto\TestResult;
 
 class NeuroTestHelper {
 
-    const OK = 'ok';
-    const FAIL = 'fail';
+    //const OK = 'ok';
+    //const FAIL = 'fail';
 
-	public static function testClassify(array $test, ClassifyHelper $classify, array $classes = []) {
-        $result = [];
+	public static function testClassify(array $test, ClassifyHelper $classify, array $classes = []) : TestResult {
         $failCases = [];
-        $stats = [
-            self::OK => 0,
-            self::FAIL => 0,
-        ];
+        $okCount = 0;
         foreach ($test as $testDocument) {
-            if(count($testDocument) > 1) {
-                list($expectedClass, $value) = $testDocument;
-                $prediction = $classify->classify($value, $classes);
-                $caseResult = [
-                    $value,
-                    $expectedClass,
-                    $prediction,
-                ];
-                $result[] = $caseResult;
-                $isSuccess = $prediction == $expectedClass;
-                $isOk = $isSuccess ? self::OK : self::FAIL;
-                $stats[$isOk]++;
-                if(!$isSuccess) {
-                    $failCases[] = $caseResult;
-                }
+            list($expectedClass, $value) = $testDocument;
+            $prediction = $classify->classify($value, $classes);
+            $caseResult = [
+                $value,
+                $expectedClass,
+                $prediction,
+            ];
+            $isSuccess = $prediction == $expectedClass;
+            if($isSuccess) {
+                $okCount++;
+            } else {
+                $failCases[] = $caseResult;
             }
         }
-
-        $stats['testCount'] = count($test);
-
-        $totalPercent = NeuroTestHelper::getPercent($test, $stats);
-
-        return [
-            'statsPercent' => $totalPercent,
-            'stats' => $stats,
-            //'failCases' => $failCases,
-        ];
+        $testResult = new TestResult;
+        $testResult->okCount = $okCount;
+        $testResult->failCases = $failCases;
+        return $testResult;
 	}
 
-    public static function getPercent($test, $percent) : TestResult {
-        $totalRate = 100 / count($test);
+    public static function renderItemInfo($test, $count) : string {
+        return NeuroTestHelper::renderItem(NeuroTestHelper::getPercentItem($test, $count), $count);
+    }
+
+    public static function renderItem($percent, $count) : string {
+        $percent = round($percent, 2);
+	    return $percent . '% (' . $count . ')';
+    }
+
+    public static function ___getPercent($test, $percent) : TestResult {
+        /*$totalRate = 100 / count($test);
+        $testResult = new TestResult;*/
+
         $testResult = new TestResult;
-        $testResult->ok = $totalRate * $percent[self::OK];
-        $testResult->fail = $totalRate * $percent[self::FAIL];
+        $testResult->ok = self::getPercentItem($test, $percent[self::OK]); // $totalRate * $percent[self::OK];
+        $testResult->fail = self::getPercentItem($test, $percent[self::FAIL]); // $totalRate * $percent[self::FAIL];
         return $testResult;
+    }
+
+    public static function getPercentItem($test, $percent) {
+        $totalRate = 100 / count($test);
+        return $totalRate * $percent;
     }
 
 }
