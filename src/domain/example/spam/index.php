@@ -7,18 +7,15 @@ use yii2extension\ml\domain\tokenizers\CharTokenizer;
 use yii2rails\extension\store\StoreFile;
 use yii\helpers\ArrayHelper;
 
+$tokenizer = new \yii2extension\ml\domain\tokenizers\WhitespaceTokenizer;
+$classify = new ClassifyHelper($tokenizer);
+$classes = ['spam', 'ham'];
+
 $trainFileName = ROOT_DIR . DS . 'vendor/yii2extension/yii2-ml/src/domain/example/data/spam.csv';
 $store = new StoreFile($trainFileName);
 $train = $store->load();
 
-
-
-//d($train);
-
 Benchmark::flushAll();
-
-$tokenizer = new \yii2extension\ml\domain\tokenizers\WhitespaceTokenizer;
-$classify = new ClassifyHelper($tokenizer);
 
 $trainPercentArray = [
     0.1,
@@ -28,13 +25,7 @@ $trainPercentArray = [
     90,
 ];
 
-$classes = ['spam', 'ham'];
-
-$totalResult = [];
-
-foreach ($trainPercentArray as $trainPercent) {
-    $totalResult[strval($trainPercent)] = NeuroTestHelper::testClassifyItem($classify, $train, $trainPercent, $classes);
-}
+$totalResult = NeuroTestHelper::testClassifyItems($classify, $train, $trainPercentArray, $classes);
 
 //d(($classify->getModel()['condprob']));
 

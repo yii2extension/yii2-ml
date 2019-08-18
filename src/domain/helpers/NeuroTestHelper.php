@@ -7,6 +7,24 @@ use yii2rails\extension\develop\helpers\Benchmark;
 
 class NeuroTestHelper {
 
+    public static function render($classify, $classes, $values) {
+        $predictions = [];
+        foreach ($values as $value) {
+            $prediction = $classify->classify($value, $classes);
+            $predictions[] = "$value = $prediction";
+        }
+        $content = implode(PHP_EOL, $predictions);
+        d($content);
+    }
+
+    public static function testClassifyItems($classify, $train, $trainPercentArray, $classes) {
+        $totalResult = [];
+        foreach ($trainPercentArray as $trainPercent) {
+            $totalResult[strval($trainPercent)] = NeuroTestHelper::testClassifyItem($classify, $train, $trainPercent, $classes);
+        }
+        return $totalResult;
+    }
+
     public static function testClassifyItem($classify, $training, $trainPercent, $classes) {
         $collectionDto = \yii2extension\ml\domain\helpers\SplitHelper::split($training, $trainPercent);
 

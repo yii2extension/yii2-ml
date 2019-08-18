@@ -43,7 +43,7 @@ class CharTokenizer implements TokenizerInterface
 
         $arr = [
             //'1' . $c1,
-            //'2' . $c2,
+            '2' . $c2,
             //'3' . $c3,
             '4' . $c2 . $c1,
             //'5' . $c3 . $c2,

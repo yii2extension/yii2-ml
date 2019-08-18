@@ -7,14 +7,15 @@ use yii2extension\ml\domain\tokenizers\CharTokenizer;
 use yii2rails\extension\store\StoreFile;
 use yii\helpers\ArrayHelper;
 
+$tokenizer = new CharTokenizer(CharTokenizer::METHOD_SOLID);
+$classify = new ClassifyHelper($tokenizer);
+$classes = [0, 1];
+
 $trainFileName = ROOT_DIR . DS . 'vendor/yii2extension/yii2-ml/src/domain/example/data/plural.csv';
 $store = new StoreFile($trainFileName);
 $train = $store->load();
 
 Benchmark::flushAll();
-
-$tokenizer = new CharTokenizer(CharTokenizer::METHOD_SOLID);
-$classify = new ClassifyHelper($tokenizer);
 
 $trainPercentArray = [
     0.1,
@@ -24,13 +25,7 @@ $trainPercentArray = [
     90,
 ];
 
-$classes = [0, 1];
-
-$totalResult = [];
-
-foreach ($trainPercentArray as $trainPercent) {
-    $totalResult[strval($trainPercent)] = NeuroTestHelper::testClassifyItem($classify, $train, $trainPercent, $classes);
-}
+$totalResult = NeuroTestHelper::testClassifyItems($classify, $train, $trainPercentArray, $classes);
 
 //d(($classify->getModel()['condprob']));
 
